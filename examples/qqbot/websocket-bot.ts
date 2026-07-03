@@ -109,7 +109,7 @@ const targetUserOpenId = process.env.QQ_BOT_TEST_USER_OPENID ?? "E173B2870055941
 try {
   const dmThreadId = await qqbot.openDM(targetUserOpenId);
   const dmThread = bot.thread(dmThreadId);
-  await dmThread.post({ markdown: "嗨" });
+  await dmThread.post({ markdown: "# 嗨" });
 } catch (error) {
   console.error("Failed to send message.", error);
 }

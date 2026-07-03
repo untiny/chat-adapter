@@ -1,6 +1,7 @@
 import { cardToFallbackText, extractCard } from "@chat-adapter/shared";
 import {
   type AdapterPostableMessage,
+  BaseFormatConverter,
   type CardElement,
   type FormattedContent,
   markdownToPlainText,
@@ -11,7 +12,7 @@ import {
 } from "chat";
 
 /** Converts between Chat SDK markdown/card content and QQBot text payloads. */
-export class QQBotFormatConverter {
+export class QQBotFormatConverter extends BaseFormatConverter {
   /** Parse QQBot message text into Chat SDK's canonical markdown AST. */
   toAst(platformText: string): Root {
     return parseMarkdown(platformText || "");

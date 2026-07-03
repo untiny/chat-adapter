@@ -184,6 +184,14 @@ export type QQBotRawMessage =
   | QQBotDirectMessage
   | QQBotWebhookPayload;
 
+export enum QQBotMessageType {
+  TEXT = 0,
+  IMAGE = 1,
+  MARKDOWN = 2,
+  ARK = 3,
+  EMBED = 4,
+}
+
 /** QQBot REST payload used to send or edit messages. */
 export interface QQBotPostMessagePayload {
   content?: string;
@@ -204,6 +212,7 @@ export interface QQBotPostMessagePayload {
   image?: string;
   file_image?: string;
   event_id?: string;
+  msg_type?: QQBotMessageType;
 }
 
 /** QQBot inline keyboard container. */

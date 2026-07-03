@@ -1,5 +1,5 @@
 import { createHash, createHmac, timingSafeEqual } from "node:crypto";
-import { extractFiles } from "@chat-adapter/shared";
+import { extractFiles, extractPostableAttachments } from "@chat-adapter/shared";
 import type {
   Adapter,
   AdapterPostableMessage,
@@ -33,14 +33,15 @@ import {
 import { QQBotFormatConverter } from "./format-converter";
 import { QQBotGatewayClient } from "./gateway";
 import { decodeQQBotThreadId, encodeQQBotThreadId } from "./thread-id";
-import type {
-  QQBotInteraction,
-  QQBotMessage,
-  QQBotPostMessagePayload,
-  QQBotRawMessage,
-  QQBotResolvedConfig,
-  QQBotThreadId,
-  QQBotWebhookPayload,
+import {
+  type QQBotInteraction,
+  type QQBotMessage,
+  QQBotMessageType,
+  type QQBotPostMessagePayload,
+  type QQBotRawMessage,
+  type QQBotResolvedConfig,
+  type QQBotThreadId,
+  type QQBotWebhookPayload,
 } from "./types";
 
 /**
@@ -464,8 +465,15 @@ export class QQBotAdapter implements Adapter<QQBotThreadId, QQBotRawMessage> {
     thread: QQBotThreadId,
     message: AdapterPostableMessage,
   ): Promise<QQBotPostMessagePayload> {
-    const content = this.converter.renderPostable(message);
-    const payload: QQBotPostMessagePayload = content ? { content } : {};
+    const payload: QQBotPostMessagePayload = {};
+    if (typeof message === "string") {
+      payload.content = message;
+    } else if ("markdown" in message) {
+      payload.msg_type = QQBotMessageType.MARKDOWN;
+      payload.markdown = { content: message.markdown };
+    } else {
+      payload.content = this.converter.renderPostable(message);
+    }
 
     if (thread.messageId) {
       payload.msg_id = thread.messageId;
@@ -487,6 +495,10 @@ export class QQBotAdapter implements Adapter<QQBotThreadId, QQBotRawMessage> {
       } else if (media.url) {
         payload.image = media.url;
       }
+    }
+
+    const attachments = extractPostableAttachments(message);
+    if (attachments.length > 0) {
     }
 
     return payload;

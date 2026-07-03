@@ -44,13 +44,6 @@
         "source.organizeImports.biome": true,
         "source.fixAll.biome": true
       }
-    },
-    "Prisma": {
-      "formatter": {
-        "language_server": {
-          "name": "prisma-language-server"
-        }
-      }
     }
   }
 }
