@@ -151,12 +151,17 @@ import { decodeQQBotThreadId, encodeQQBotThreadId } from "@untiny/chat-adapter-q
 
 const threadId = encodeQQBotThreadId({
   kind: "guild",
-  guildId: "guild-id",
-  channelId: "channel-id",
+  guildId: "guild123",
+  channelId: "channel456",
 });
 
 const decoded = decodeQQBotThreadId(threadId);
 ```
+
+Generated thread IDs keep QQBot routing IDs readable, for example
+`qqbot:guild:guild123:channel456`. When present, the optional source `messageId`
+segment is still base64url encoded because QQBot message IDs may include
+non-routing characters.
 
 Supported thread kinds:
 

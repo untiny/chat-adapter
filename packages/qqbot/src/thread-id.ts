@@ -11,7 +11,7 @@ function decodeSegment(value: string): string {
   return Buffer.from(value, "base64url").toString("utf8");
 }
 
-/** Encode QQBot thread routing data into a colon-safe Chat SDK thread ID. */
+/** Encode QQBot thread routing data into a Chat SDK thread ID. */
 export function encodeQQBotThreadId(data: QQBotThreadId): string {
   if (data.kind === "guild") {
     if (!data.guildId || !data.channelId) {
@@ -20,8 +20,8 @@ export function encodeQQBotThreadId(data: QQBotThreadId): string {
     return [
       PREFIX,
       "guild",
-      encodeSegment(data.guildId),
-      encodeSegment(data.channelId),
+      data.guildId,
+      data.channelId,
       data.messageId ? encodeSegment(data.messageId) : undefined,
     ]
       .filter(Boolean)
@@ -35,7 +35,7 @@ export function encodeQQBotThreadId(data: QQBotThreadId): string {
     return [
       PREFIX,
       "group",
-      encodeSegment(data.groupOpenId),
+      data.groupOpenId,
       data.messageId ? encodeSegment(data.messageId) : undefined,
     ]
       .filter(Boolean)
@@ -48,8 +48,8 @@ export function encodeQQBotThreadId(data: QQBotThreadId): string {
   return [
     PREFIX,
     "dm",
-    encodeSegment(data.userOpenId),
-    data.guildId ? encodeSegment(data.guildId) : undefined,
+    data.userOpenId,
+    data.guildId,
     data.messageId ? encodeSegment(data.messageId) : undefined,
   ]
     .filter(Boolean)
@@ -70,8 +70,8 @@ export function decodeQQBotThreadId(threadId: string): QQBotThreadId {
     }
     return {
       kind,
-      guildId: decodeSegment(parts[2]),
-      channelId: decodeSegment(parts[3]),
+      guildId: parts[2],
+      channelId: parts[3],
       messageId: parts[4] ? decodeSegment(parts[4]) : undefined,
     };
   }
@@ -79,7 +79,7 @@ export function decodeQQBotThreadId(threadId: string): QQBotThreadId {
   if (kind === "group") {
     return {
       kind,
-      groupOpenId: decodeSegment(parts[2]),
+      groupOpenId: parts[2],
       messageId: parts[3] ? decodeSegment(parts[3]) : undefined,
     };
   }
@@ -87,8 +87,8 @@ export function decodeQQBotThreadId(threadId: string): QQBotThreadId {
   if (kind === "dm") {
     return {
       kind,
-      userOpenId: decodeSegment(parts[2]),
-      guildId: parts[4] ? decodeSegment(parts[3]) : undefined,
+      userOpenId: parts[2],
+      guildId: parts[4] ? parts[3] : undefined,
       messageId: parts[4]
         ? decodeSegment(parts[4])
         : parts[3]
