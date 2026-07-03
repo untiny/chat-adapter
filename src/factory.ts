@@ -1,7 +1,7 @@
 import { ConsoleLogger, type Logger } from "chat";
-import { validationError } from "./errors";
 import { QQBotAdapter } from "./adapter";
 import { resolveApiBaseUrl } from "./client";
+import { validationError } from "./errors";
 import type { QQBotAdapterConfig, QQBotResolvedConfig, QQBotTransport } from "./types";
 
 /** QQBot Gateway intent bit for guild metadata events. */
@@ -52,7 +52,9 @@ export function resolveConfig(
 
   const sandbox =
     config.sandbox ??
-    (process.env.QQ_BOT_SANDBOX ? ["1", "true", "yes"].includes(process.env.QQ_BOT_SANDBOX) : false);
+    (process.env.QQ_BOT_SANDBOX
+      ? ["1", "true", "yes"].includes(process.env.QQ_BOT_SANDBOX)
+      : false);
   const intentsRaw = config.intents ?? parseNumber(process.env.QQ_BOT_INTENTS);
 
   return {

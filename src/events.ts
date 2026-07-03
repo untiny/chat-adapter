@@ -1,13 +1,13 @@
-import { Message, parseMarkdown, type Author } from "chat";
-import { decodeQQBotButtonData } from "./cards";
+import { type Author, Message, parseMarkdown } from "chat";
 import type { QQBotAdapter } from "./adapter";
+import { decodeQQBotButtonData } from "./cards";
 import type {
   QQBotInteraction,
   QQBotMessage,
   QQBotRawMessage,
   QQBotThreadId,
-  QQBotWebhookPayload,
   QQBotUser,
+  QQBotWebhookPayload,
 } from "./types";
 
 /** Extract the dispatch data from a QQBot webhook/Gateway envelope. */
@@ -90,7 +90,10 @@ export function threadFromInteraction(interaction: QQBotInteraction): QQBotThrea
     return { kind: "group", groupOpenId: interaction.group_openid };
   }
   if (interaction.user_openid || userIdFromQQBotUser(interaction.user)) {
-    return { kind: "dm", userOpenId: interaction.user_openid ?? userIdFromQQBotUser(interaction.user) };
+    return {
+      kind: "dm",
+      userOpenId: interaction.user_openid ?? userIdFromQQBotUser(interaction.user),
+    };
   }
   if (interaction.guild_id && interaction.channel_id) {
     return {

@@ -1,14 +1,14 @@
+import { cardToFallbackText, extractCard } from "@chat-adapter/shared";
 import {
-  markdownToPlainText,
-  parseMarkdown,
-  stringifyMarkdown,
-  toPlainText,
   type AdapterPostableMessage,
   type CardElement,
   type FormattedContent,
+  markdownToPlainText,
+  parseMarkdown,
   type Root,
+  stringifyMarkdown,
+  toPlainText,
 } from "chat";
-import { cardToFallbackText, extractCard } from "@chat-adapter/shared";
 
 /** Converts between Chat SDK markdown/card content and QQBot text payloads. */
 export class QQBotFormatConverter {

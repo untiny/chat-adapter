@@ -64,6 +64,7 @@ export interface QQBotResolvedConfig extends QQBotAdapterConfig {
   userName: string;
   intents: number;
   reconnect: boolean;
+  logger: Logger;
 }
 
 /** Cached QQBot app access token with an absolute expiry time. */

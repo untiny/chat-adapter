@@ -19,7 +19,8 @@ function createExampleState(): StateAdapter {
   const queues = new Map<string, QueueEntry[]>();
   const subscriptions = new Set<string>();
 
-  const isExpired = (expiresAt?: number) => typeof expiresAt === "number" && expiresAt <= Date.now();
+  const isExpired = (expiresAt?: number) =>
+    typeof expiresAt === "number" && expiresAt <= Date.now();
   const queueKey = (threadId: string) => `queue:${threadId}`;
   const getValue = <T = unknown>(key: string): T | null => {
     const item = values.get(key);
@@ -121,7 +122,8 @@ function createExampleState(): StateAdapter {
       const key = queueKey(threadId);
       const queue = queues.get(key) ?? [];
       while (queue.length > 0) {
-        const entry = queue.shift()!;
+        const entry = queue.shift();
+        if (!entry) break;
         if (entry.expiresAt > Date.now()) {
           queues.set(key, queue);
           return entry;
@@ -174,9 +176,7 @@ const intentNames = [
 ] as const;
 
 function describeIntents(value: number): string[] {
-  return intentNames
-    .filter(([intent]) => (value & intent) === intent)
-    .map(([, name]) => name);
+  return intentNames.filter(([intent]) => (value & intent) === intent).map(([, name]) => name);
 }
 
 const bot = new Chat({

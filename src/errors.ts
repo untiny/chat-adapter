@@ -31,7 +31,7 @@ export function mapQQBotError(
   const message =
     typeof body === "string"
       ? body
-      : body?.message ?? `QQBot API request failed with status ${status}`;
+      : (body?.message ?? `QQBot API request failed with status ${status}`);
 
   if (status === 401 || status === 403) {
     return status === 401

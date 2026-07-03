@@ -1,24 +1,24 @@
 import { createHash, createHmac, timingSafeEqual } from "node:crypto";
-import {
-  Message,
-  type Adapter,
-  type AdapterPostableMessage,
-  type ChannelInfo,
-  type ChatInstance,
-  type EmojiValue,
-  type EphemeralMessage,
-  type FetchOptions,
-  type FetchResult,
-  type FormattedContent,
-  type Logger,
-  type RawMessage,
-  type StreamChunk,
-  type StreamOptions,
-  type ThreadInfo,
-  type UserInfo,
-  type WebhookOptions,
-} from "chat";
 import { extractFiles } from "@chat-adapter/shared";
+import type {
+  Adapter,
+  AdapterPostableMessage,
+  ChannelInfo,
+  ChatInstance,
+  EmojiValue,
+  EphemeralMessage,
+  FetchOptions,
+  FetchResult,
+  FormattedContent,
+  Logger,
+  Message,
+  RawMessage,
+  StreamChunk,
+  StreamOptions,
+  ThreadInfo,
+  UserInfo,
+  WebhookOptions,
+} from "chat";
 import { QQBotClient } from "./client";
 import { ADAPTER_NAME, validationError } from "./errors";
 import {
@@ -68,7 +68,7 @@ export class QQBotAdapter implements Adapter<QQBotThreadId, QQBotRawMessage> {
   /** Create a QQBot adapter from already resolved configuration. */
   constructor(readonly config: QQBotResolvedConfig) {
     this.userName = config.userName;
-    this.logger = config.logger!;
+    this.logger = config.logger;
     this.client = new QQBotClient({
       appId: config.appId,
       secret: config.secret,
@@ -196,7 +196,11 @@ export class QQBotAdapter implements Adapter<QQBotThreadId, QQBotRawMessage> {
     message: AdapterPostableMessage,
   ): Promise<RawMessage<QQBotRawMessage>> {
     const thread = this.decodeThreadId(threadId);
-    const raw = await this.client.editMessage(thread, messageId, await this.toQQBotPayload(thread, message));
+    const raw = await this.client.editMessage(
+      thread,
+      messageId,
+      await this.toQQBotPayload(thread, message),
+    );
     return { id: raw.id ?? messageId, raw, threadId };
   }
 
@@ -220,7 +224,11 @@ export class QQBotAdapter implements Adapter<QQBotThreadId, QQBotRawMessage> {
     messageId: string,
     emoji: EmojiValue | string,
   ): Promise<void> {
-    await this.client.removeReaction(this.decodeThreadId(threadId), messageId, emojiToString(emoji));
+    await this.client.removeReaction(
+      this.decodeThreadId(threadId),
+      messageId,
+      emojiToString(emoji),
+    );
   }
 
   /** Fetch recent guild channel messages in chronological order. */
@@ -238,8 +246,7 @@ export class QQBotAdapter implements Adapter<QQBotThreadId, QQBotRawMessage> {
     });
     const messages = raw.map((message) => this.parseMessage(message));
     messages.sort(
-      (a, b) =>
-        new Date(a.metadata.dateSent).getTime() - new Date(b.metadata.dateSent).getTime(),
+      (a, b) => new Date(a.metadata.dateSent).getTime() - new Date(b.metadata.dateSent).getTime(),
     );
     return {
       messages,
@@ -248,7 +255,10 @@ export class QQBotAdapter implements Adapter<QQBotThreadId, QQBotRawMessage> {
   }
 
   /** Fetch one guild channel message by ID. */
-  async fetchMessage(threadId: string, messageId: string): Promise<Message<QQBotRawMessage> | null> {
+  async fetchMessage(
+    threadId: string,
+    messageId: string,
+  ): Promise<Message<QQBotRawMessage> | null> {
     const raw = await this.client.fetchMessage(this.decodeThreadId(threadId), messageId);
     return this.parseMessage(raw);
   }
@@ -256,12 +266,24 @@ export class QQBotAdapter implements Adapter<QQBotThreadId, QQBotRawMessage> {
   /** Return minimal thread metadata derived from the encoded thread ID. */
   async fetchThread(threadId: string): Promise<ThreadInfo> {
     const decoded = this.decodeThreadId(threadId);
-    const channelId =
-      decoded.kind === "guild"
-        ? decoded.channelId!
-        : decoded.kind === "group"
-          ? decoded.groupOpenId!
-          : (decoded.guildId ?? decoded.userOpenId!);
+    let channelId: string;
+    if (decoded.kind === "guild") {
+      if (!decoded.channelId) {
+        throw validationError("QQBot guild thread is missing channelId.");
+      }
+      channelId = decoded.channelId;
+    } else if (decoded.kind === "group") {
+      if (!decoded.groupOpenId) {
+        throw validationError("QQBot group thread is missing groupOpenId.");
+      }
+      channelId = decoded.groupOpenId;
+    } else {
+      const dmChannelId = decoded.guildId ?? decoded.userOpenId;
+      if (!dmChannelId) {
+        throw validationError("QQBot DM thread is missing userOpenId.");
+      }
+      channelId = dmChannelId;
+    }
     return {
       id: threadId,
       channelId,
@@ -354,7 +376,8 @@ export class QQBotAdapter implements Adapter<QQBotThreadId, QQBotRawMessage> {
     let accumulated = "";
     let sent: RawMessage<QQBotRawMessage> | null = null;
     for await (const chunk of textStream) {
-      const text = typeof chunk === "string" ? chunk : chunk.type === "markdown_text" ? chunk.text : "";
+      const text =
+        typeof chunk === "string" ? chunk : chunk.type === "markdown_text" ? chunk.text : "";
       if (!text) continue;
       accumulated += text;
       if (!sent) {
@@ -385,7 +408,10 @@ export class QQBotAdapter implements Adapter<QQBotThreadId, QQBotRawMessage> {
   }
 
   /** Dispatch a Gateway frame through the same event path used by webhooks. */
-  async dispatchGatewayEvent(event: { t?: string; d?: unknown }, options?: WebhookOptions): Promise<void> {
+  async dispatchGatewayEvent(
+    event: { t?: string; d?: unknown },
+    options?: WebhookOptions,
+  ): Promise<void> {
     this.logger.debug("QQBot gateway dispatch received.", { type: event.t });
     await this.dispatchEvent(event.t, event.d, event as QQBotWebhookPayload, options);
   }

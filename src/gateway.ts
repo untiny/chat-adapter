@@ -37,9 +37,12 @@ export class QQBotGatewayClient {
   /** Open a WebSocket connection and attach Gateway event handlers. */
   async connect(options?: WebhookOptions): Promise<void> {
     const WebSocketCtor =
-      this.WebSocketImpl ?? (globalThis as unknown as { WebSocket?: QQBotWebSocketConstructor }).WebSocket;
+      this.WebSocketImpl ??
+      (globalThis as unknown as { WebSocket?: QQBotWebSocketConstructor }).WebSocket;
     if (!WebSocketCtor) {
-      this.logger.warn("QQBot WebSocket transport requested but no WebSocket implementation is available.");
+      this.logger.warn(
+        "QQBot WebSocket transport requested but no WebSocket implementation is available.",
+      );
       return;
     }
 
@@ -99,7 +102,9 @@ export class QQBotGatewayClient {
     if (typeof event.s === "number") this.sequence = event.s;
 
     if (event.op === OP_HELLO) {
-      const interval = Number((event.d as { heartbeat_interval?: number })?.heartbeat_interval ?? 45_000);
+      const interval = Number(
+        (event.d as { heartbeat_interval?: number })?.heartbeat_interval ?? 45_000,
+      );
       this.startHeartbeat(interval);
       await this.identifyOrResume();
       return;

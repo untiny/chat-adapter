@@ -144,9 +144,12 @@ export class QQBotClient {
       );
       return;
     }
-    await this.request(`/v2/users/${required(thread.userOpenId, "userOpenId")}/messages/${messageId}`, {
-      method: "DELETE",
-    });
+    await this.request(
+      `/v2/users/${required(thread.userOpenId, "userOpenId")}/messages/${messageId}`,
+      {
+        method: "DELETE",
+      },
+    );
   }
 
   /** Fetch a single guild channel message. */
@@ -182,11 +185,7 @@ export class QQBotClient {
   }
 
   /** Add an emoji reaction to a guild channel message. */
-  async addReaction(
-    thread: QQBotThreadId,
-    messageId: string,
-    emoji: string,
-  ): Promise<void> {
+  async addReaction(thread: QQBotThreadId, messageId: string, emoji: string): Promise<void> {
     if (thread.kind !== "guild") {
       throw validationError("QQBot reactions are only available for guild channel messages.");
     }
@@ -197,11 +196,7 @@ export class QQBotClient {
   }
 
   /** Remove an emoji reaction from a guild channel message. */
-  async removeReaction(
-    thread: QQBotThreadId,
-    messageId: string,
-    emoji: string,
-  ): Promise<void> {
+  async removeReaction(thread: QQBotThreadId, messageId: string, emoji: string): Promise<void> {
     if (thread.kind !== "guild") {
       throw validationError("QQBot reactions are only available for guild channel messages.");
     }
@@ -235,9 +230,17 @@ export class QQBotClient {
     const formData = new FormData();
     formData.set(
       "file",
-      new Blob([buffer.buffer.slice(buffer.byteOffset, buffer.byteOffset + buffer.byteLength) as ArrayBuffer], {
-        type: file.contentType ?? "application/octet-stream",
-      }),
+      new Blob(
+        [
+          buffer.buffer.slice(
+            buffer.byteOffset,
+            buffer.byteOffset + buffer.byteLength,
+          ) as ArrayBuffer,
+        ],
+        {
+          type: file.contentType ?? "application/octet-stream",
+        },
+      ),
       file.filename ?? "file",
     );
 
@@ -302,13 +305,13 @@ export class QQBotClient {
 }
 
 /** Resolve the QQBot REST API base URL from explicit config or sandbox mode. */
-export function resolveApiBaseUrl(config: Pick<QQBotAdapterConfig, "apiBaseUrl" | "sandbox">): string {
+export function resolveApiBaseUrl(
+  config: Pick<QQBotAdapterConfig, "apiBaseUrl" | "sandbox">,
+): string {
   if (config.apiBaseUrl) {
     return config.apiBaseUrl.replace(/\/$/, "");
   }
-  return config.sandbox
-    ? "https://sandbox.api.sgroup.qq.com"
-    : "https://api.sgroup.qq.com";
+  return config.sandbox ? "https://sandbox.api.sgroup.qq.com" : "https://api.sgroup.qq.com";
 }
 
 async function safeJson(response: Response): Promise<unknown> {

@@ -247,13 +247,19 @@ describe("QQBotAdapter", () => {
     );
 
     await adapter.initialize(createMockChatInstance());
-    const socket = MockWebSocket.instances[0]!;
+    const socket = MockWebSocket.instances[0];
+    expect(socket).toBeDefined();
+    if (!socket) throw new Error("Expected gateway socket to be created.");
+
     socket.onmessage?.({
       data: JSON.stringify({ op: 10, d: { heartbeat_interval: 60_000 } }),
     });
     await new Promise((resolve) => setTimeout(resolve, 0));
 
-    expect(JSON.parse(socket.sent[0]!).op).toBe(2);
+    const identifyPayload = socket.sent[0];
+    expect(identifyPayload).toBeDefined();
+    if (!identifyPayload) throw new Error("Expected identify payload to be sent.");
+    expect(JSON.parse(identifyPayload).op).toBe(2);
     await adapter.disconnect();
   });
 
@@ -305,7 +311,11 @@ describe("QQBotAdapter", () => {
     );
 
     await adapter.initialize(createMockChatInstance());
-    MockWebSocket.instances[0]?.onclose?.({ code: 4014, reason: "disallowed intents", wasClean: true });
+    MockWebSocket.instances[0]?.onclose?.({
+      code: 4014,
+      reason: "disallowed intents",
+      wasClean: true,
+    });
     await vi.advanceTimersByTimeAsync(5000);
 
     expect(MockWebSocket.instances).toHaveLength(1);

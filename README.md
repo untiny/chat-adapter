@@ -191,6 +191,7 @@ export type * from "chat-adapter-qqbot";
 
 ```bash
 pnpm install
+pnpm check
 pnpm test
 pnpm typecheck
 pnpm build
@@ -199,6 +200,10 @@ pnpm build
 Available scripts:
 
 - `pnpm build`: build the package with tsup.
+- `pnpm check`: run Biome formatting and lint checks.
+- `pnpm check:fix`: apply Biome safe fixes and formatting.
+- `pnpm format`: format supported files with Biome.
+- `pnpm lint`: run Biome lint checks.
 - `pnpm dev`: build in watch mode.
 - `pnpm test`: run the Vitest test suite.
 - `pnpm test:watch`: run Vitest in watch mode.
@@ -209,3 +214,4 @@ Available scripts:
 ## License
 
 MIT
+

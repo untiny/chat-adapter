@@ -6,18 +6,11 @@ export const QQBOT_BUTTON_DATA_DELIMITER = "\n";
 export const QQBOT_BUTTON_DATA_MAX_LENGTH = 1024;
 
 /** Encode a Chat SDK button action ID and optional value for QQBot keyboards. */
-export function encodeQQBotButtonData(
-  actionId: string,
-  value?: string,
-): string {
+export function encodeQQBotButtonData(actionId: string, value?: string): string {
   const encoded =
-    value == null || value === ""
-      ? actionId
-      : `${actionId}${QQBOT_BUTTON_DATA_DELIMITER}${value}`;
+    value == null || value === "" ? actionId : `${actionId}${QQBOT_BUTTON_DATA_DELIMITER}${value}`;
   if (Buffer.byteLength(encoded, "utf8") > QQBOT_BUTTON_DATA_MAX_LENGTH) {
-    throw validationError(
-      `QQBot button data exceeds ${QQBOT_BUTTON_DATA_MAX_LENGTH} bytes.`,
-    );
+    throw validationError(`QQBot button data exceeds ${QQBOT_BUTTON_DATA_MAX_LENGTH} bytes.`);
   }
   return encoded;
 }

@@ -89,7 +89,11 @@ export function decodeQQBotThreadId(threadId: string): QQBotThreadId {
       kind,
       userOpenId: decodeSegment(parts[2]),
       guildId: parts[4] ? decodeSegment(parts[3]) : undefined,
-      messageId: parts[4] ? decodeSegment(parts[4]) : parts[3] ? decodeSegment(parts[3]) : undefined,
+      messageId: parts[4]
+        ? decodeSegment(parts[4])
+        : parts[3]
+          ? decodeSegment(parts[3])
+          : undefined,
     };
   }
 
